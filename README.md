@@ -2,11 +2,13 @@
 
 Documentation of building a custom GPT assistant focused on keeping you focused by managing Google Calendars and Todoist lists.
 
+[![Live Demo](https://custom-icon-badges.demolab.com/badge/-Live%20Demo-blue?style=for-the-badge&logo=link-external&logoColor=white)](https://chatgpt.com/g/g-XmOKnlm7k-attention-ally)
+
 ## Repository Structure
 
 - **instructions-prompt**: Contains configuration details for setting up the initial GPT prompt.
-- **todoist.yml**: Defines the action schemas for interacting with Todoist.
-- **google-calendar.yml**: Defines the action schemas for interacting with Google Calendar.
+- **actions/todoist.yml**: Defines the action schemas for interacting with Todoist.
+- **actions/google-calendar.yml**: Defines the action schemas for interacting with Google Calendar.
 
 ## Configuring a Custom GPT
 
