@@ -1,0 +1,303 @@
+# Todoist REST API - OpenAPI 3.1.0 Spec
+# Based on https://developer.todoist.com/rest/v2/
+# Built with ActionsGPT https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
+openapi: 3.1.0
+info:
+  title: Todoist API
+  description: The Todoist REST API allows developers to manage tasks, projects, and more within the Todoist platform.
+  version: 1.0.0
+servers:
+  - url: https://api.todoist.com/rest/v2
+    description: Todoist REST API v2
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://todoist.com/oauth/authorize
+          tokenUrl: https://todoist.com/oauth/access_token
+          scopes:
+            data: Read and write access to Todoist data
+security:
+  - oauth2: []
+paths:
+  /projects:
+    get:
+      operationId: getProjects
+      summary: Retrieve all projects
+      description: Retrieves a list of all projects in the user's Todoist account.
+      security:
+        - oauth2: []
+      responses:
+        "200":
+          description: A list of user projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The project ID.
+                    name:
+                      type: string
+                      description: The name of the project.
+                    comment_count:
+                      type: integer
+                      description: The number of comments associated with the project.
+                    order:
+                      type: integer
+                      description: The order of the project.
+                    color:
+                      type: string
+                      description: The color of the project.
+                    is_shared:
+                      type: boolean
+                      description: Indicates if the project is shared.
+                    is_inbox_project:
+                      type: boolean
+                      description: Indicates if the project is the Inbox.
+                    url:
+                      type: string
+                      description: URL to access this project in Todoist.
+
+    post:
+      operationId: createProject
+      summary: Create a new project
+      description: Adds a new project to the user's Todoist account.
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the project.
+                color:
+                  type: string
+                  description: The color of the project icon.
+                is_favorite:
+                  type: boolean
+                  description: Indicates if the project is a favorite.
+      responses:
+        "200":
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The project ID.
+                  name:
+                    type: string
+                    description: The name of the project.
+
+  /projects/{id}:
+    get:
+      operationId: getProjectById
+      summary: Retrieve a specific project by ID
+      description: Gets details of a single project by its ID.
+      security:
+        - oauth2: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The project ID.
+      responses:
+        "200":
+          description: A single project
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The project ID.
+                  name:
+                    type: string
+                    description: The name of the project.
+                  color:
+                    type: string
+                    description: The color of the project icon.
+                  is_favorite:
+                    type: boolean
+                    description: Indicates if the project is a favorite.
+
+    post:
+      operationId: updateProject
+      summary: Update a specific project
+      description: Update a project by providing its ID.
+      security:
+        - oauth2: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The project ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The new name of the project.
+                color:
+                  type: string
+                  description: The new color of the project.
+                is_favorite:
+                  type: boolean
+                  description: Marks project as favorite.
+      responses:
+        "200":
+          description: Project updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The project ID.
+                  name:
+                    type: string
+                    description: The name of the project.
+
+    delete:
+      operationId: deleteProject
+      summary: Delete a specific project
+      description: Delete a project by its ID.
+      security:
+        - oauth2: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The project ID.
+      responses:
+        "204":
+          description: Project deleted successfully
+
+  /tasks:
+    get:
+      operationId: getTasks
+      summary: Retrieve active tasks
+      description: Retrieve all active tasks in the user's Todoist account.
+      security:
+        - oauth2: []
+      responses:
+        "200":
+          description: A list of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The task ID.
+                    content:
+                      type: string
+                      description: The task content.
+                    project_id:
+                      type: string
+                      description: The ID of the project the task belongs to.
+                    due:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          description: The due date of the task.
+
+    post:
+      operationId: createTask
+      summary: Create a new task
+      description: Add a new task to the user's Todoist account.
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: The task content.
+                due_string:
+                  type: string
+                  description: The due date in natural language (e.g., "tomorrow").
+                project_id:
+                  type: string
+                  description: The ID of the project the task belongs to.
+      responses:
+        "200":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The task ID.
+                  content:
+                    type: string
+                    description: The task content.
+
+  /tasks/{id}:
+    get:
+      operationId: getTaskById
+      summary: Retrieve a task by ID
+      description: Get details of a task by its ID.
+      security:
+        - oauth2: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The task ID.
+      responses:
+        "200":
+          description: A single task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The task ID.
+                  content:
+                    type: string
+                    description: The task content.
+                  due:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        description: The task due date.
