@@ -1,0 +1,352 @@
+# Google Calendar API - OpenAPI 3.1.0 Spec
+# Based on https://developers.google.com/calendar/api/v3/reference
+# Built with ActionsGPT https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
+
+openapi: 3.1.0
+info:
+  title: Google Calendar API
+  description: Google Calendar API allows you to manage calendars and events. This spec covers listing calendars and CRUD operations for events.
+  version: 1.0.0
+servers:
+  - url: https://www.googleapis.com/calendar/v3
+    description: Google Calendar API v3
+components:
+  schemas: {} # Explicitly defining an empty schemas object to avoid errors
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            https://www.googleapis.com/auth/calendar: Full access to Google Calendar
+            https://www.googleapis.com/auth/calendar.events: Manage events on Google Calendar
+security:
+  - oauth2: []
+paths:
+  /users/me/calendarList:
+    get:
+      operationId: listCalendars
+      summary: List all calendars
+      description: Retrieves all calendars for the authenticated user.
+      security:
+        - oauth2: []
+      responses:
+        "200":
+          description: A list of calendars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The calendar ID (used to manage events).
+                        summary:
+                          type: string
+                          description: The name of the calendar.
+                        timeZone:
+                          type: string
+                          description: The time zone of the calendar.
+                        accessRole:
+                          type: string
+                          description: The access role for the calendar.
+
+  /calendars/{calendarId}/events:
+    get:
+      operationId: listEvents
+      summary: List events in a calendar
+      description: Retrieves all events from the specified calendar.
+      security:
+        - oauth2: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the calendar to retrieve events from.
+        - name: maxResults
+          in: query
+          schema:
+            type: integer
+          description: Maximum number of events to return.
+        - name: timeMin
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Lower bound (inclusive) for event start times to filter by (RFC3339 format).
+        - name: timeMax
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Upper bound (exclusive) for event start times to filter by (RFC3339 format).
+      responses:
+        "200":
+          description: A list of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The event ID.
+                        summary:
+                          type: string
+                          description: The summary of the event.
+                        description:
+                          type: string
+                          description: The description of the event.
+                        start:
+                          type: object
+                          properties:
+                            dateTime:
+                              type: string
+                              format: date-time
+                              description: Start time of the event.
+                        end:
+                          type: object
+                          properties:
+                            dateTime:
+                              type: string
+                              format: date-time
+                              description: End time of the event.
+
+    post:
+      operationId: createEvent
+      summary: Create a new event
+      description: Creates a new event in the specified calendar.
+      security:
+        - oauth2: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the calendar to create the event in.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                summary:
+                  type: string
+                  description: The summary or title of the event.
+                description:
+                  type: string
+                  description: A description of the event.
+                start:
+                  type: object
+                  properties:
+                    dateTime:
+                      type: string
+                      format: date-time
+                      description: The start date and time of the event (RFC3339).
+                end:
+                  type: object
+                  properties:
+                    dateTime:
+                      type: string
+                      format: date-time
+                      description: The end date and time of the event (RFC3339).
+      responses:
+        "200":
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the created event.
+                  summary:
+                    type: string
+                    description: The title of the event.
+                  description:
+                    type: string
+                    description: The description of the event.
+                  start:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: Start time of the event.
+                  end:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: End time of the event.
+
+  /calendars/{calendarId}/events/{eventId}:
+    get:
+      operationId: getEvent
+      summary: Retrieve an event
+      description: Gets the details of a specific event by its ID.
+      security:
+        - oauth2: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the calendar the event belongs to.
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the event to retrieve.
+      responses:
+        "200":
+          description: The event details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The event ID.
+                  summary:
+                    type: string
+                    description: The event title.
+                  description:
+                    type: string
+                    description: A description of the event.
+                  start:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: Start time of the event.
+                  end:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: End time of the event.
+
+    put:
+      operationId: updateEvent
+      summary: Update an event
+      description: Updates an existing event in the specified calendar.
+      security:
+        - oauth2: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the calendar the event belongs to.
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the event to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                summary:
+                  type: string
+                  description: The updated summary of the event.
+                description:
+                  type: string
+                  description: The updated description of the event.
+                start:
+                  type: object
+                  properties:
+                    dateTime:
+                      type: string
+                      format: date-time
+                      description: The updated start date and time of the event.
+                end:
+                  type: object
+                  properties:
+                    dateTime:
+                      type: string
+                      format: date-time
+                      description: The updated end date and time of the event.
+      responses:
+        "200":
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The event ID.
+                  summary:
+                    type: string
+                    description: The updated title of the event.
+                  description:
+                    type: string
+                    description: The updated description of the event.
+                  start:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: The updated start time of the event.
+                  end:
+                    type: object
+                    properties:
+                      dateTime:
+                        type: string
+                        format: date-time
+                        description: The updated end time of the event.
+
+    delete:
+      operationId: deleteEvent
+      summary: Delete an event
+      description: Deletes a specific event from the calendar.
+      security:
+        - oauth2: []
+      parameters:
+        - name: calendarId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the calendar the event belongs to.
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the event to delete.
+      responses:
+        "204":
+          description: Event deleted successfully
